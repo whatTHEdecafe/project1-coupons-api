@@ -40,3 +40,16 @@ npm install -g newman
 
 newman run coupons_newman.json
 
+git init
+
+git status
+
+git add .
+
+git commit -m "Project 1 coupons API"
+
+git remote add origin https://github.com/whatTHEdecafe/project1-coupons-api.git
+
+git branch -M main
+
+git push -u origin main
