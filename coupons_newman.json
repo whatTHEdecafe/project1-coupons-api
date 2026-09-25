@@ -1,0 +1,45 @@
+{
+  "info": {
+    "_postman_id": "f00d4d73-a9e1-473d-8c10-9365594d5638",
+    "name": "coupons_newman",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52182519",
+    "_collection_link": "https://go.postman.co/collection/52182519-f00d4d73-a9e1-473d-8c10-9365594d5638?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get Coupons",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Validate message output\", function () {\r\n    const jsonData = pm.response.json();\r\n    pm.expect(jsonData.message).to.eql(\"Coupons API is working successfully\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4566/restapis/rgoxuzdrv4/dev/_user_request_/coupons_poc",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4566",
+          "path": [
+            "restapis",
+            "rgoxuzdrv4",
+            "dev",
+            "_user_request_",
+            "coupons_poc"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+aws iam create-role --role-name coupons_lambda_role --assume-role-policy-document file://trust-policy.json --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws iam create-policy --policy-name coupons_permissions --policy-document file://coupons-permissions.json --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws iam attach-role-policy --role-name coupons_lambda_role --policy-arn arn:aws:iam::000000000000:policy/coupons_permissions --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws iam list-attached-role-policies --role-name coupons_lambda_role --endpoint-url=http://localhost:4566 --region us-east-1
+
+Compress-Archive -Path index.js -DestinationPath function.zip -Force
+
+aws lambda create-function --function-name coupons_list --runtime nodejs18.x --role arn:aws:iam::000000000000:role/coupons_lambda_role --handler index.handler --zip-file fileb://function.zip --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws lambda list-functions --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws lambda invoke --function-name coupons_list --payload file://event.json --cli-binary-format raw-in-base64-out --endpoint-url=http://localhost:4566 --region us-east-1 output.json
+
+aws apigateway create-rest-api --name coupons --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws apigateway create-resource --rest-api-id rgoxuzdrv4 --parent-id uazt0ickni --path-part coupons_poc --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws apigateway put-method --rest-api-id rgoxuzdrv4 --resource-id 79od4ortj6 --http-method GET --authorization-type NONE --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws apigateway put-integration --rest-api-id rgoxuzdrv4 --resource-id 79od4ortj6 --http-method GET --type AWS_PROXY --integration-http-method POST --uri arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:000000000000:function:coupons_list/invocations --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws lambda add-permission --function-name coupons_list --statement-id apigateway-coupons --action lambda:InvokeFunction --principal apigateway.amazonaws.com --source-arn "arn:aws:execute-api:us-east-1:000000000000:rgoxuzdrv4/*/GET/coupons_poc" --endpoint-url=http://localhost:4566 --region us-east-1
+
+aws apigateway create-deployment --rest-api-id rgoxuzdrv4 --stage-name dev --endpoint-url=http://localhost:4566 --region us-east-1
+
+Invoke-RestMethod -Uri "http://localhost:4566/restapis/rgoxuzdrv4/dev/_user_request_/coupons_poc" -Method GET
+
+npm init -y
+
+npm install --save-dev jest
+
+npm test
+
+npx jest --json --outputFile=unit_test.json
+
+npm install -g newman
+
+newman run coupons_newman.json
+
